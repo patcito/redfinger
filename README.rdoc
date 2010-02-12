@@ -2,6 +2,11 @@
 
 Redfinger is a simple Ruby library built to consume the Webfinger protocol. It's simple!
 
+For more information about Webfinger, see:
+
+* http://hueniverse.com/2009/08/introducing-webfinger/
+* http://code.google.com/p/webfinger/
+
 == Installation
 
 Redfinger is a gem:
