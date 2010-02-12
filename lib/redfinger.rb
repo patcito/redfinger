@@ -9,6 +9,8 @@ module Redfinger
   # webfinger process does not appear safe, such as
   # mismatched domains or an unverified XRD signature.
   class SecurityException < StandardError; end
+  
+  # Finger the provided e-mail address.
   def self.finger(email)
     Redfinger::Client.new(email).finger
   end

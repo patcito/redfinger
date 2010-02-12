@@ -9,6 +9,8 @@ module Redfinger
       self[:type] = xml_link['type']
     end
     
+    # Outputs the URL of the link, useful for using 
+    # a Link directly in other libraries.
     def to_s
       self.href
     end
