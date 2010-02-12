@@ -18,7 +18,7 @@ Just call it with an e-mail address of a domain that provides the Webfinger prot
     
 From there, you have access to the links provided in the response as well as some shortcuts for common uses:
 
-    finger = Redfinger.finger('youraccount@gmail.com)
+    finger = Redfinger.finger('youraccount@gmail.com')
     finger.open_id.first.to_s # => "http://www.google.com/profiles/youraccount"
     
 Links are simple hash based objects that store the 'rel' URI (such as that for hCard, OpenID, etc.), the 'href' (the actual destination URI), and the content type if specified. Note you can also just use <tt>#to_s</tt> on a link to get the destination URI.
@@ -28,7 +28,7 @@ So how can you use Webfinger to your advantage? Let's take the example of hCard.
     require 'mofo'
     require 'redfinger'
     
-    hcard_uri = Redfinger.finger('example@gmail.com').hcard.first
+    hcard_uri = Redfinger.finger('example@gmail.com').hcard.first.to_s
     hcard = hCard.find(hcard_uri)
     hcard.fn    # => "Example Guy"
     hcard.title # => "Title guy gave himself on Google profile"
