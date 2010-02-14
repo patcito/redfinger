@@ -11,7 +11,7 @@ begin
     gem.homepage = "http://github.com/mbleigh/redfinger"
     gem.authors = ["Michael Bleigh"]
     gem.add_dependency "rest-client"
-    gem.add_dependency "nokogiri"
+    gem.add_dependency "nokogiri", ">= 1.4.0"
     gem.add_dependency "hashie"
     gem.add_development_dependency "rspec", ">= 1.2.9"
     gem.add_development_dependency "webmock"
