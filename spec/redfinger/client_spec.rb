@@ -4,12 +4,8 @@ class HaltSuccessError < StandardError; end
 
 describe Redfinger::Client do
   describe '#new' do
-    it 'should add acct: if it is not in URI form' do
-      Redfinger::Client.new('abc@example.com').account.should == 'acct:abc@example.com'
-    end
-    
-    it 'should not add acct: if it is already in URI form' do
-      Redfinger::Client.new('acct:abc@example.com').account.should == 'acct:abc@example.com'
+    it 'should remove acct: if it is already in URI form' do
+      Redfinger::Client.new('acct:abc@example.com').account.should == 'abc@example.com'
     end
     
     it 'should set the domain to whatevers after the @ sign' do

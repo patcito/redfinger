@@ -29,7 +29,6 @@ def finger_xrd
   <<-XML
   <?xml version='1.0'?>
   <XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'>
-  	<Subject>acct:abc@example.com</Subject>
   	<Alias>http://www.google.com/profiles/abc</Alias>
   	<Link rel='http://portablecontacts.net/spec/1.0' href='http://www-opensocial.googleusercontent.com/api/people/'/>
   	<Link rel='http://webfinger.net/rel/profile-page' href='http://www.google.com/profiles/abc' type='text/html'/>
@@ -43,9 +42,9 @@ def finger_xrd
   XML
 end
 
-def stub_success
+def stub_success(address = 'abc@example.com')
   stub_request(:get, 'https://example.com/.well-known/host-meta').to_return(:status => 200, :body => host_xrd)
-  stub_request(:get, /webfinger\/\?q=.*/).to_return(:status => 200, :body => finger_xrd)
+  stub_request(:get, /webfinger\/\?q=#{address}/).to_return(:status => 200, :body => finger_xrd)
 end
 
 Spec::Runner.configure do |config|

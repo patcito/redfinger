@@ -7,13 +7,17 @@ module Redfinger
     attr_accessor :account, :domain, :uri_template
 
     def initialize(email, uri_template = nil)
-      self.account = urify(email)
+      self.account = normalize(email)
       self.domain = account.split('@').last
     end
 
     def finger
       self.uri_template ||= retrieve_template_from_xrd
-      Finger.new RestClient.get(swizzle).body
+      begin
+        return Finger.new self.account, RestClient.get(swizzle).body
+      rescue RestClient::ResourceNotFound
+        return Finger.new self.account, RestClient.get(swizzle(account_with_scheme)).body
+      end
     end
 
     def xrd_url(ssl = true)
@@ -22,7 +26,8 @@ module Redfinger
 
     private
 
-    def swizzle
+    def swizzle(account = nil)
+      account ||= self.account
       uri_template.gsub '{uri}', URI.escape(self.account)
     end
 
@@ -47,9 +52,13 @@ module Redfinger
       end
     end
 
-    def urify(email)
-      email = "acct:#{email}" unless email.include?("acct:")
-      email
+    def normalize(email)
+      email.sub! /^acct:/, ''
+      email.downcase
+    end
+
+    def account_with_scheme
+      "acct:" + account
     end
   end
 end

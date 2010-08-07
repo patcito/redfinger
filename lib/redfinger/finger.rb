@@ -5,9 +5,9 @@ module Redfinger
   # special helpers that are availale to pull specific types
   # of URLs, see Redfinger::LinkHelpers
   class Finger
-    def initialize(xml) # :nodoc:
+    def initialize(subject, xml) # :nodoc:
       @doc = Nokogiri::XML::Document.parse(xml)
-      @subject = @doc.at_css('Subject').content
+      @subject = subject
     end
     
     # All of the links provided by the Webfinger response.
