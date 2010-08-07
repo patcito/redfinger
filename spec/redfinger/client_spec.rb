@@ -41,11 +41,6 @@ describe Redfinger::Client do
       stub_request(:get, 'https://example.com/.well-known/host-meta').to_return(:status => 200, :body => host_xrd)
       Redfinger::Client.new('acct:abc@example.com').send(:retrieve_template_from_xrd).should == 'http://example.com/webfinger/?q={uri}'
     end
-    
-    it 'should raise a SecurityException if there is a host mismatch' do
-      stub_request(:get, 'https://franklin.com/.well-known/host-meta').to_return(:status => 200, :body => host_xrd)
-      lambda{Redfinger::Client.new('acct:abc@franklin.com').send(:retrieve_template_from_xrd)}.should raise_error(Redfinger::SecurityException)
-    end
   end
   
   describe '#finger' do

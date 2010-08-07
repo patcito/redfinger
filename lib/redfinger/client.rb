@@ -33,14 +33,11 @@ module Redfinger
 
     def retrieve_template_from_xrd(ssl = true)
       doc = Nokogiri::XML::Document.parse(RestClient.get(xrd_url(ssl)).body)
-      if doc.namespaces["xmlns:hm"] != "http://host-meta.net/xrd/1.0"
+      if doc.namespaces["xmlns"] != "http://docs.oasis-open.org/ns/xri/xrd-1.0"
         # it's probably not finger, let's try without ssl
         # http://code.google.com/p/webfinger/wiki/WebFingerProtocol
         # says first ssl should be tried then without ssl, should fix issue #2
         doc = Nokogiri::XML::Document.parse(RestClient.get(xrd_url(false)).body)
-      end
-      unless doc.at_xpath('.//hm:Host').content == self.domain
-        raise Redfinger::SecurityException, "The XRD document's host did not match the account's host."
       end
 
       doc.at('Link[rel=lrdd]').attribute('template').value
