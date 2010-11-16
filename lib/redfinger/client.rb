@@ -41,7 +41,7 @@ module Redfinger
       end
 
       doc.at('Link[rel=lrdd]').attribute('template').value
-    rescue Errno::ECONNREFUSED, RestClient::ResourceNotFound
+    rescue Errno::ECONNREFUSED, RestClient::ResourceNotFound, RestClient::Forbidden
       if ssl
         retrieve_template_from_xrd(false)
       else
