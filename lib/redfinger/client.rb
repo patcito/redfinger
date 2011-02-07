@@ -4,11 +4,14 @@ require 'uri'
 
 module Redfinger
   class Client
-    attr_accessor :account, :domain, :uri_template
+    attr_accessor :account, :domain, :uri_template, :xrd_timeout, :xrd_open_timeout
 
     def initialize(email, uri_template = nil)
       self.account = normalize(email)
       self.domain = account.split('@').last
+
+      self.xrd_timeout = 10
+      self.xrd_open_timeout = 5
     end
 
     def finger
@@ -32,7 +35,12 @@ module Redfinger
     end
 
     def retrieve_template_from_xrd(ssl = true)
-      doc = Nokogiri::XML::Document.parse(RestClient.get(xrd_url(ssl)).body)
+      xrd_client =  RestClient::Resource.new(xrd_url(ssl),
+                      :timeout => self.xrd_timeout,
+                      :open_timeout => self.xrd_open_timeout
+                    )
+
+      doc = Nokogiri::XML::Document.parse(xrd_client.get.body)
       if doc.namespaces["xmlns"] != "http://docs.oasis-open.org/ns/xri/xrd-1.0"
         # it's probably not finger, let's try without ssl
         # http://code.google.com/p/webfinger/wiki/WebFingerProtocol
@@ -41,7 +49,8 @@ module Redfinger
       end
 
       doc.at('Link[rel=lrdd]').attribute('template').value
-    rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT, RestClient::ResourceNotFound, RestClient::Forbidden
+    rescue  Errno::ECONNREFUSED, Errno::ETIMEDOUT,
+            RestClient::RequestTimeout, RestClient::ResourceNotFound, RestClient::Forbidden
       if ssl
         retrieve_template_from_xrd(false)
       else
