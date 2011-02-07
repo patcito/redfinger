@@ -3,11 +3,11 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'rubygems'
 require 'redfinger'
-require 'spec'
-require 'spec/autorun'
+require 'rspec'
+require 'rspec/autorun'
 require 'webmock/rspec'
 
-include WebMock
+include WebMock::API
 
 def host_xrd
   <<-XML
@@ -43,6 +43,6 @@ def stub_success(address = 'abc@example.com')
   stub_request(:get, /webfinger\/\?q=#{address}/).to_return(:status => 200, :body => finger_xrd)
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   
 end
