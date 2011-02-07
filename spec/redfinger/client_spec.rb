@@ -26,6 +26,12 @@ describe Redfinger::Client do
       lambda{Redfinger::Client.new('acct:abc@example.com').send(:retrieve_template_from_xrd)}.should raise_error(HaltSuccessError)
     end
 
+    it 'should make an HTTP request if the HTTPS request times out' do
+      stub_request(:get, 'https://example.com/.well-known/host-meta').to_raise(Errno::ETIMEDOUT)
+      stub_request(:get, 'http://example.com/.well-known/host-meta').to_raise(HaltSuccessError)
+      lambda{Redfinger::Client.new('acct:abc@example.com').send(:retrieve_template_from_xrd)}.should raise_error(HaltSuccessError)
+    end
+
     it 'should make an HTTP request if the server throws a 403 forbidden on the HTTPS request' do
       stub_request(:get, 'https://example.com/.well-known/host-meta').to_return(:status => [403, "Forbidden"])
       stub_request(:get, 'http://example.com/.well-known/host-meta').to_raise(HaltSuccessError)
