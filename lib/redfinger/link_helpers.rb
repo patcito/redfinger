@@ -25,7 +25,7 @@ module Redfinger
     protected
     
     def relmap(uri, substring=false)
-      @doc.css("Link[rel#{'^' if substring}=\"#{uri}\"]").map{|e| Link.new(e)}
+      @doc.css("Link[rel#{'^' if substring}=\"#{uri}\"]").map{|e| Link.from_xml(e)}
     end
   end
 end

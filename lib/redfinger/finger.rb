@@ -12,7 +12,7 @@ module Redfinger
     
     # All of the links provided by the Webfinger response.
     def links
-      @links ||= @doc.css('Link').map{|l| Link.new(l)}
+      @links ||= @doc.css('Link').map{|l| Link.from_xml(l)}
     end
     
     def inspect # :nodoc:
