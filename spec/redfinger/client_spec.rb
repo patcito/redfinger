@@ -4,12 +4,8 @@ class HaltSuccessError < StandardError; end
 
 describe Redfinger::Client do
   describe '#new' do
-    it 'should add acct: if it is not in URI form' do
-      Redfinger::Client.new('abc@example.com').account.should == 'acct:abc@example.com'
-    end
-    
-    it 'should not add acct: if it is already in URI form' do
-      Redfinger::Client.new('acct:abc@example.com').account.should == 'acct:abc@example.com'
+    it 'should remove acct: if it is already in URI form' do
+      Redfinger::Client.new('acct:abc@example.com').account.should == 'abc@example.com'
     end
     
     it 'should set the domain to whatevers after the @ sign' do
@@ -29,6 +25,24 @@ describe Redfinger::Client do
       stub_request(:get, 'http://example.com/.well-known/host-meta').to_raise(HaltSuccessError)
       lambda{Redfinger::Client.new('acct:abc@example.com').send(:retrieve_template_from_xrd)}.should raise_error(HaltSuccessError)
     end
+
+    it 'should make an HTTP request if the HTTPS request times out in Net::HTTP' do
+      stub_request(:get, 'https://example.com/.well-known/host-meta').to_raise(Errno::ETIMEDOUT)
+      stub_request(:get, 'http://example.com/.well-known/host-meta').to_raise(HaltSuccessError)
+      lambda{Redfinger::Client.new('acct:abc@example.com').send(:retrieve_template_from_xrd)}.should raise_error(HaltSuccessError)
+    end
+
+    it 'should make an HTTP request if the HTTPS request times out in RestClient' do
+      stub_request(:get, 'https://example.com/.well-known/host-meta').to_raise(RestClient::RequestTimeout)
+      stub_request(:get, 'http://example.com/.well-known/host-meta').to_raise(HaltSuccessError)
+      lambda{Redfinger::Client.new('acct:abc@example.com').send(:retrieve_template_from_xrd)}.should raise_error(HaltSuccessError)
+    end
+
+    it 'should make an HTTP request if the server throws a 403 forbidden on the HTTPS request' do
+      stub_request(:get, 'https://example.com/.well-known/host-meta').to_return(:status => [403, "Forbidden"])
+      stub_request(:get, 'http://example.com/.well-known/host-meta').to_raise(HaltSuccessError)
+      lambda{Redfinger::Client.new('acct:abc@example.com').send(:retrieve_template_from_xrd)}.should raise_error(HaltSuccessError)
+    end
     
     it 'should raise Redfinger::ResourceNotFound if HTTP fails as well' do
       stub_request(:get, 'https://example.com/.well-known/host-meta').to_raise(Errno::ECONNREFUSED)
@@ -44,11 +58,6 @@ describe Redfinger::Client do
     it 'should return the template' do
       stub_request(:get, 'https://example.com/.well-known/host-meta').to_return(:status => 200, :body => host_xrd)
       Redfinger::Client.new('acct:abc@example.com').send(:retrieve_template_from_xrd).should == 'http://example.com/webfinger/?q={uri}'
-    end
-    
-    it 'should raise a SecurityException if there is a host mismatch' do
-      stub_request(:get, 'https://franklin.com/.well-known/host-meta').to_return(:status => 200, :body => host_xrd)
-      lambda{Redfinger::Client.new('acct:abc@franklin.com').send(:retrieve_template_from_xrd)}.should raise_error(Redfinger::SecurityException)
     end
   end
   

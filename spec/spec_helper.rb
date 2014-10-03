@@ -3,20 +3,16 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 require 'rubygems'
 require 'redfinger'
-require 'spec'
-require 'spec/autorun'
+require 'rspec'
+require 'rspec/autorun'
 require 'webmock/rspec'
 
-include WebMock
+include WebMock::API
 
 def host_xrd
   <<-XML
   <?xml version='1.0' encoding='UTF-8'?>
-  <!-- NOTE: this host-meta end-point is a pre-alpha work in progress.   Don't rely on it. -->
-  <!-- Please follow the list at http://groups.google.com/group/webfinger -->
-  <XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0' 
-       xmlns:hm='http://host-meta.net/xrd/1.0'>
-    <hm:Host xmlns='http://host-meta.net/xrd/1.0'>example.com</hm:Host>
+  <XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'>
     <Link rel='lrdd' 
           template='http://example.com/webfinger/?q={uri}'>
       <Title>Resource Descriptor</Title>
@@ -29,7 +25,6 @@ def finger_xrd
   <<-XML
   <?xml version='1.0'?>
   <XRD xmlns='http://docs.oasis-open.org/ns/xri/xrd-1.0'>
-  	<Subject>acct:abc@example.com</Subject>
   	<Alias>http://www.google.com/profiles/abc</Alias>
   	<Link rel='http://portablecontacts.net/spec/1.0' href='http://www-opensocial.googleusercontent.com/api/people/'/>
   	<Link rel='http://webfinger.net/rel/profile-page' href='http://www.google.com/profiles/abc' type='text/html'/>
@@ -43,11 +38,11 @@ def finger_xrd
   XML
 end
 
-def stub_success
+def stub_success(address = 'abc@example.com')
   stub_request(:get, 'https://example.com/.well-known/host-meta').to_return(:status => 200, :body => host_xrd)
-  stub_request(:get, /webfinger\/\?q=.*/).to_return(:status => 200, :body => finger_xrd)
+  stub_request(:get, /webfinger\/\?q=#{address}/).to_return(:status => 200, :body => finger_xrd)
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   
 end

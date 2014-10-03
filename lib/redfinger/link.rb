@@ -3,10 +3,12 @@ require 'hashie'
 
 module Redfinger
   class Link < Hashie::Mash
-    def initialize(xml_link)
-      self[:rel] = xml_link['rel']
-      self[:href] = xml_link['href']
-      self[:type] = xml_link['type']
+    def self.from_xml(xml_link)
+      new_link = Link.new
+      new_link[:rel]  = xml_link['rel']
+      new_link[:href] = xml_link['href']
+      new_link[:type] = xml_link['type']
+      new_link
     end
     
     # Outputs the URL of the link, useful for using 

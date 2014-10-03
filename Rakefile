@@ -10,7 +10,7 @@ begin
     gem.email = "michael@intridea.com"
     gem.homepage = "http://github.com/mbleigh/redfinger"
     gem.authors = ["Michael Bleigh"]
-    gem.add_dependency "rest-client"
+    gem.add_dependency "rest-client", ">= 1.5.0"
     gem.add_dependency "nokogiri", ">= 1.4.0"
     gem.add_dependency "hashie"
     gem.add_development_dependency "rspec", ">= 1.2.9"
@@ -22,15 +22,10 @@ rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
 end
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/**/*_spec.rb']
-end
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new(:spec)
 
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.pattern = 'spec/**/*_spec.rb'
+RSpec::Core::RakeTask.new(:rcov) do |spec|
   spec.rcov = true
 end
 
